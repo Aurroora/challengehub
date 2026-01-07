@@ -1,0 +1,132 @@
+[
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 1,
+    "fields": {
+      "title": "30 дней ежедневной зарядки",
+      "description": "Начните свой день с 15-минутной зарядки. Улучшите физическую форму, поднимите настроение и зарядитесь энергией на весь день. Каждый день - новая мини-тренировка.",
+      "category": "sport",
+      "duration_days": 30,
+      "difficulty": 1,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 2,
+    "fields": {
+      "title": "Рисуй каждый день 30 дней",
+      "description": "Развивайте творческие способности через ежедневное рисование. Неважно, что и как - важно делать это каждый день. Отлично подходит для начинающих художников.",
+      "category": "creative",
+      "duration_days": 30,
+      "difficulty": 2,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 3,
+    "fields": {
+      "title": "15 минут английского каждый день",
+      "description": "Изучайте английский язык всего по 15 минут в день. Используйте приложения, смотрите короткие видео, читайте статьи. Постоянство - ключ к успеху в изучении языков.",
+      "category": "study",
+      "duration_days": 30,
+      "difficulty": 2,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 4,
+    "fields": {
+      "title": "Пей 2 литра воды в день",
+      "description": "Следите за водным балансом организма. Улучшите состояние кожи, пищеварение и общее самочувствие. Отслеживайте потребление воды через приложение или заметки.",
+      "category": "health",
+      "duration_days": 21,
+      "difficulty": 1,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 5,
+    "fields": {
+      "title": "Ранний подъем в 6 утра",
+      "description": "Научитесь вставать раньше и использовать утренние часы максимально продуктивно. Планируйте день, занимайтесь саморазвитием или просто наслаждайтесь тишиной.",
+      "category": "productivity",
+      "duration_days": 14,
+      "difficulty": 3,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 6,
+    "fields": {
+      "title": "10 000 шагов каждый день",
+      "description": "Достигайте рекомендованной нормы физической активности. Улучшайте сердечно-сосудистую систему, сжигайте калории и повышайте ежедневную энергичность.",
+      "category": "sport",
+      "duration_days": 30,
+      "difficulty": 2,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 7,
+    "fields": {
+      "title": "Медитация 10 минут в день",
+      "description": "Развивайте осознанность и снижайте стресс через ежедневную медитацию. Учитесь управлять мыслями, улучшайте концентрацию и качество сна.",
+      "category": "health",
+      "duration_days": 21,
+      "difficulty": 2,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 8,
+    "fields": {
+      "title": "Читай по 20 страниц в день",
+      "description": "Верните себе привычку читать книги. Всего 20 страниц в день - это примерно 1 книга в месяц. Расширяйте кругозор, vocabulary и отдыхайте от экранов.",
+      "category": "study",
+      "duration_days": 30,
+      "difficulty": 1,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 9,
+    "fields": {
+      "title": "Фотография дня",
+      "description": "Делайте хотя бы одну интересную фотографию каждый день. Развивайте креативное видение, учитесь видеть красоту в обычных вещах и создавайте фотоисторию месяца.",
+      "category": "creative",
+      "duration_days": 30,
+      "difficulty": 2,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "challenges.challengetemplate",
+    "pk": 10,
+    "fields": {
+      "title": "Без соцсетей после 21:00",
+      "description": "Улучшите качество сна и вечернего отдыха, отказавшись от соцсетей и новостей перед сном. Замените скроллинг на чтение, общение с близкими или хобби.",
+      "category": "productivity",
+      "duration_days": 14,
+      "difficulty": 3,
+      "is_active": true,
+      "created_at": "2024-01-01T10:00:00Z"
+    }
+  }
+]
