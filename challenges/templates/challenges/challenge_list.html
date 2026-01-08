@@ -1,0 +1,98 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Все челленджи{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">🎯 Доступные челленджи</h1>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <!-- Фильтры -->
+        <div class="btn-group" role="group">
+            <a href="?category=" class="btn btn-outline-secondary">Все</a>
+            <a href="?category=sport" class="btn btn-outline-secondary">🏃 Спорт</a>
+            <a href="?category=creative" class="btn btn-outline-secondary">🎨 Творчество</a>
+            <a href="?category=study" class="btn btn-outline-secondary">📚 Обучение</a>
+            <a href="?category=health" class="btn btn-outline-secondary">💊 Здоровье</a>
+            <a href="?category=productivity" class="btn btn-outline-secondary">⚡ Продуктивность</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- Сортировка -->
+        <select class="form-select" id="sort-select">
+            <option value="title">По названию</option>
+            <option value="difficulty">По сложности</option>
+            <option value="duration">По длительности</option>
+        </select>
+
+        <script>
+        document.getElementById('sort-select').addEventListener('change', function() {
+            const sortValue = this.value;
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('sort', sortValue);
+            window.location.href = currentUrl.toString();
+        });
+
+        // Устанавливаем выбранное значение при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sortParam = urlParams.get('sort');
+            if (sortParam) {
+                document.getElementById('sort-select').value = sortParam;
+            }
+        });
+        </script>
+    </div>
+</div>
+
+<div class="row">
+    {% for challenge in challenges %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card challenge-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title">{{ challenge.title }}</h5>
+                    <span class="badge bg-{{ challenge.category }} category-badge">
+                        {{ challenge.get_category_display }}
+                    </span>
+                </div>
+                
+                <div class="difficulty-stars mb-2">
+                    {{ challenge.difficulty_stars }}
+                </div>
+                
+                <p class="card-text">{{ challenge.description|truncatechars:120 }}</p>
+                
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">
+                            <i class="bi bi-calendar"></i> {{ challenge.duration_days }} дней
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            ID: {{ challenge.pk }}
+                        </span>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'challenge_detail' challenge.pk %}" class="btn btn-primary">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5>Пока нет доступных челленджей</h5>
+            <p>Челленджи скоро появятся. А пока вы можете создать свой собственный!</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="mt-4 text-center">
+    <p class="text-muted">Показано {{ challenges.count }} челленджей</p>
+</div>
+{% endblock %}

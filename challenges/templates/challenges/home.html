@@ -1,0 +1,127 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Главная{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-5">
+    <div class="col-md-6">
+        <h1 class="display-4 fw-bold mb-4">🎯 ChallengeHub</h1>
+        <p class="lead mb-4">Создавай полезные привычки. Отслеживай прогресс. Достигай целей каждый день.</p>
+        <div class="d-grid gap-2 d-md-flex">
+            <a href="{% url 'challenge_list' %}" class="btn btn-primary btn-lg px-4 me-md-2">
+                Начать челлендж
+            </a>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg px-4">
+                    Присоединиться
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-light border-0">
+            <div class="card-body p-4">
+                <h5 class="card-title">✨ Почему ChallengeHub?</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">✅ Готовые шаблоны челленджей</li>
+                    <li class="mb-2">📊 Визуализация прогресса</li>
+                    <li class="mb-2">📱 Удобное отслеживание</li>
+                    <li class="mb-2">🏆 Достижения и статистика</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="mb-4">🔥 Популярные категории</h2>
+        <div class="row">
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="fs-1 mb-2">🏃</div>
+                        <h6 class="card-title">Спорт</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="fs-1 mb-2">🎨</div>
+                        <h6 class="card-title">Творчество</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="fs-1 mb-2">📚</div>
+                        <h6 class="card-title">Обучение</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="fs-1 mb-2">💊</div>
+                        <h6 class="card-title">Здоровье</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="fs-1 mb-2">⚡</div>
+                        <h6 class="card-title">Продуктивность</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="fs-1 mb-2">📌</div>
+                        <h6 class="card-title">Другое</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if featured_challenges %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">🚀 Попробуйте эти челленджи</h2>
+        <div class="row">
+            {% for challenge in featured_challenges %}
+            <div class="col-md-4">
+                <div class="card challenge-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title">{{ challenge.title }}</h5>
+                            <span class="badge bg-secondary category-badge">
+                                {{ challenge.get_category_display }}
+                            </span>
+                        </div>
+                        <div class="difficulty-stars mb-2">
+                            {{ challenge.difficulty_stars }}
+                        </div>
+                        <p class="card-text small text-muted">{{ challenge.description|truncatechars:100 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">
+                                {{ challenge.duration_days }} дней
+                            </span>
+                            <a href="{% url 'challenge_detail' challenge.pk %}" class="btn btn-sm btn-outline-primary">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
