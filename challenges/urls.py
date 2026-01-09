@@ -1,6 +1,13 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -17,7 +24,12 @@ urlpatterns = [
     path('my-stats/', views.overall_statistics, name='overall_stats'),
     
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='challenges/login.html'), name='login'),
+    path('login/', auth_views.LoginView.as_view(
+        template_name='challenges/login.html',
+        redirect_authenticated_user=True,
+        next_page='/profile/'
+    ), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('profile/', views.profile, name='profile'),
+    path('logout/', views.logout_view, name='logout'),
 ]

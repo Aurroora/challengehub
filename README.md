@@ -39,3 +39,7 @@ ChallengeHub/
 ```bash
 git clone <ваш-репозиторий>
 cd ChallengeHub
+
+## Данные для входа
+## логин Аня
+## пароль admin12345

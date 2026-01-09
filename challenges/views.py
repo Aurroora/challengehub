@@ -1,18 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth import login
-from .models import ChallengeTemplate, UserChallenge
-from .forms import UserRegisterForm, UserUpdateForm
-from .forms import StartChallengeForm, CustomChallengeForm
+from django.contrib.auth import login, logout
 from django.utils.timezone import now
+import pandas as pd
+
 from .models import ChallengeTemplate, UserChallenge, DailyCheckin
-from datetime import timedelta
+from .forms import UserRegisterForm, UserUpdateForm, StartChallengeForm, CustomChallengeForm
+
+from datetime import datetime, timedelta
 import plotly.graph_objects as go
 import plotly.offline as opy
-import pandas as pd
 import random
-from datetime import datetime, timedelta
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 def home(request):
     """Главная страница"""

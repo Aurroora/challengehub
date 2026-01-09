@@ -20,9 +20,9 @@
             </p>
             
             <div class="progress mb-3" style="height: 20px;">
-                <div class="progress-bar bg-success" 
-                    style="width: 50%">
-                    50%
+                <div class="progress-bar bg-success calendar-progress-bar" 
+                    data-progress="{{ user_challenge.completion_percentage }}">
+                    {{ user_challenge.completion_percentage }}%
                 </div>
             </div>
         </div>
