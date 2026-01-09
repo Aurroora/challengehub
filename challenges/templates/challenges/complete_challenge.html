@@ -1,0 +1,46 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Завершить челлендж{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="card-title mb-0">⚠️ Завершить челлендж досрочно</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="fs-1 mb-3">🎯</div>
+                    <h5>{{ user_challenge.title }}</h5>
+                    <p class="text-muted">
+                        Прогресс: {{ user_challenge.completion_percentage }}% 
+                        ({{ user_challenge.completed_days }} из {{ user_challenge.duration_days }} дней)
+                    </p>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6>Вы уверены, что хотите завершить челлендж?</h6>
+                    <ul class="mb-0">
+                        <li>Челлендж будет отмечен как "Завершен"</li>
+                        <li>Вы больше не сможете отмечать выполнение</li>
+                        <li>Прогресс сохранится</li>
+                    </ul>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="confirm" value="yes" class="btn btn-warning btn-lg">
+                            ✅ Да, завершить челлендж
+                        </button>
+                        <button type="submit" name="confirm" value="no" class="btn btn-outline-secondary">
+                            ← Нет, вернуться назад
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

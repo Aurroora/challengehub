@@ -43,16 +43,16 @@
         <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-5">
             {% if user.is_authenticated %}
                 {% if user_challenge %}
-                    <button class="btn btn-success btn-lg me-md-2" disabled>
+                    <a href="{% url 'profile' %}" class="btn btn-success btn-lg me-md-2">
                         ✅ Вы уже участвуете
-                    </button>
-                    <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-lg">
-                        Перейти к моим челленджам
+                    </a>
+                    <a href="{% url 'daily_checkin' user_challenge.id %}" class="btn btn-primary btn-lg">
+                        📝 Отметить сегодня
                     </a>
                 {% else %}
-                    <button class="btn btn-primary btn-lg me-md-2" disabled>
-                        Начать челлендж (скоро)
-                    </button>
+                    <a href="{% url 'start_challenge' challenge.pk %}" class="btn btn-primary btn-lg me-md-2">
+                        🚀 Начать челлендж
+                    </a>
                     <a href="{% url 'challenge_list' %}" class="btn btn-outline-secondary btn-lg">
                         Назад к списку
                     </a>

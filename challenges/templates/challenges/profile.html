@@ -127,6 +127,19 @@
                                             <span class="badge bg-warning text-dark">Приостановлен</span>
                                         {% endif %}
                                     </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'daily_checkin' challenge.id %}" class="btn btn-outline-primary">
+                                                📝 Отметить
+                                            </a>
+                                            <a href="{% url 'challenge_calendar' challenge.id %}" class="btn btn-outline-info btn-sm">
+                                                📅 Календарь
+                                            </a>
+                                            <a href="{% url 'complete_challenge' challenge.id %}" class="btn btn-outline-warning">
+                                                ✅ Завершить
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

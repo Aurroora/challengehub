@@ -1,0 +1,157 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Отметка выполнения{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="card-title mb-0">📝 Отметка выполнения</h4>
+            </div>
+            <div class="card-body">
+                {% if existing_checkin %}
+                <div class="alert alert-warning">
+                    <strong>⚠️ Вы уже отметились сегодня</strong>
+                    <p class="mb-0">Можете изменить отметку ниже. Она заменит предыдущую.</p>
+                </div>
+                {% endif %}
+                
+                <div class="mb-4">
+                    <h5>{{ user_challenge.title }}</h5>
+                    <p class="text-muted">
+                        День {{ user_challenge.days_passed }} из {{ user_challenge.duration_days }}
+                        | Прогресс: {{ user_challenge.completion_percentage }}%
+                    </p>
+                    
+                    <div class="progress mb-2" style="height: 20px;">
+                        <div class="progress-bar bg-success" 
+                            data-width="{{ user_challenge.completion_percentage }}"
+                            id="progress-bar">
+                            {{ user_challenge.completion_percentage }}%
+                        </div>
+                    </div>
+
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const progressBar = document.getElementById('progress-bar');
+                        const width = progressBar.getAttribute('data-width');
+                        progressBar.style.width = width + '%';
+                    });
+                    </script>
+                    
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Начало: {{ user_challenge.start_date|date:"d.m.Y" }}</span>
+                        <span>Окончание: {{ user_challenge.end_date|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_completed" 
+                                   id="id_is_completed" value="true" 
+                                   {% if existing_checkin and existing_checkin.is_completed %}checked{% else %}checked{% endif %}>
+                            <label class="form-check-label" for="id_is_completed">
+                                <strong>✅ Выполнено сегодня</strong>
+                            </label>
+                        </div>
+                        <div class="form-text">Отметьте, если выполнили задание сегодня</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_rating" class="form-label">Как прошел день?</label>
+                        <select name="rating" class="form-select" id="id_rating">
+                            <option value="">Не оценивать</option>
+                            <option value="1" {% if existing_checkin and existing_checkin.rating == 1 %}selected{% endif %}>😞 Плохо</option>
+                            <option value="2" {% if existing_checkin and existing_checkin.rating == 2 %}selected{% endif %}>😐 Нормально</option>
+                            <option value="3" {% if existing_checkin and existing_checkin.rating == 3 %}selected{% endif %}>🙂 Хорошо</option>
+                            <option value="4" {% if existing_checkin and existing_checkin.rating == 4 %}selected{% endif %}>😊 Отлично</option>
+                            <option value="5" {% if existing_checkin and existing_checkin.rating == 5 %}selected{% endif %}>🤩 Супер!</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_notes" class="form-label">Заметки за день (необязательно)</label>
+                        <textarea name="notes" class="form-control" id="id_notes" rows="3" 
+                                  placeholder="Что получилось? Что было сложно?">{% if existing_checkin %}{{ existing_checkin.notes }}{% endif %}</textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>📅 Сегодня: {{ today|date:"d.m.Y" }}</h6>
+                        <p class="mb-0">Эта отметка будет сохранена за сегодняшним днем.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="submit" class="btn btn-success btn-lg me-md-2">
+                            💾 Сохранить отметку
+                        </button>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-lg">
+                            ← Назад в профиль
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6>📊 История отметок</h6>
+                {% if user_challenge.checkins.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                    <th>Оценка</th>
+                                    <th>Заметки</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for checkin in user_challenge.checkins.all|slice:":10" %}
+                                <tr>
+                                    <td>
+                                        {{ checkin.date|date:"d.m.Y" }}
+                                        {% if checkin.date == today %}
+                                            <span class="badge bg-info">Сегодня</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if checkin.is_completed %}
+                                            <span class="badge bg-success">✅</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">❌</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if checkin.rating %}
+                                            {% if checkin.rating == 1 %}😞
+                                            {% elif checkin.rating == 2 %}😐
+                                            {% elif checkin.rating == 3 %}🙂
+                                            {% elif checkin.rating == 4 %}😊
+                                            {% elif checkin.rating == 5 %}🤩
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small">{{ checkin.notes|truncatechars:30|default:"—" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if user_challenge.checkins.count > 10 %}
+                    <p class="text-muted small mt-2 mb-0">Показано последние 10 отметок из {{ user_challenge.checkins.count }}</p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted mb-0">Пока нет отметок. Сделайте первую!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

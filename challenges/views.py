@@ -4,8 +4,10 @@ from django.contrib import messages
 from django.contrib.auth import login
 from .models import ChallengeTemplate, UserChallenge
 from .forms import UserRegisterForm, UserUpdateForm
-from .forms import StartChallengeForm, DailyCheckinForm, CustomChallengeForm
+from .forms import StartChallengeForm, CustomChallengeForm
 from django.utils.timezone import now
+from .models import ChallengeTemplate, UserChallenge, DailyCheckin
+from datetime import timedelta
 
 def home(request):
     """Главная страница"""
@@ -111,23 +113,22 @@ def start_challenge(request, pk):
         return redirect('challenge_detail', pk=pk)
     
     if request.method == 'POST':
-        form = StartChallengeForm(request.POST)
-        if form.is_valid():
-            user_challenge = form.save(commit=False)
-            user_challenge.user = request.user
-            user_challenge.template = challenge
-            user_challenge.status = 'active'
-            user_challenge.start_date = now().date()
-            user_challenge.save()
-            
-            messages.success(request, f'Челлендж "{challenge.title}" начат!')
-            return redirect('profile')
-    else:
-        form = StartChallengeForm()
+        # Простая форма без использования forms.py
+        notes = request.POST.get('notes', '')
+        
+        user_challenge = UserChallenge.objects.create(
+            user=request.user,
+            template=challenge,
+            status='active',
+            notes=notes,
+            start_date=now().date()
+        )
+        
+        messages.success(request, f'Челлендж "{challenge.title}" начат! Удачи!')
+        return redirect('profile')
     
     return render(request, 'challenges/start_challenge.html', {
-        'challenge': challenge,
-        'form': form
+        'challenge': challenge
     })
 
 @login_required
@@ -154,38 +155,108 @@ def daily_checkin(request, challenge_id):
     """Ежедневная отметка"""
     user_challenge = get_object_or_404(UserChallenge, pk=challenge_id, user=request.user)
     
-    # Проверяем, есть ли уже отметка на сегодня
     today = now().date()
     existing_checkin = DailyCheckin.objects.filter(
         user_challenge=user_challenge,
         date=today
     ).first()
     
+    # Если уже есть отметка на сегодня и это GET запрос
+    if existing_checkin and request.method == 'GET':
+        messages.info(request, 'Вы уже отметились сегодня. Можете отредактировать отметку.')
+    
     if request.method == 'POST':
-        form = DailyCheckinForm(request.POST, instance=existing_checkin)
-        if form.is_valid():
-            checkin = form.save(commit=False)
-            checkin.user_challenge = user_challenge
-            checkin.date = today
+        is_completed = request.POST.get('is_completed') == 'true'
+        rating = request.POST.get('rating')
+        notes = request.POST.get('notes', '')
+        
+        if existing_checkin:
+            # Обновляем существующую отметку
+            was_completed = existing_checkin.is_completed
+            existing_checkin.is_completed = is_completed
+            existing_checkin.rating = int(rating) if rating else None
+            existing_checkin.notes = notes
+            existing_checkin.save()
             
-            # Обновляем статистику челленджа
-            if checkin.is_completed and not (existing_checkin and existing_checkin.is_completed):
+            # Обновляем счетчик дней
+            if is_completed and not was_completed:
                 user_challenge.completed_days += 1
-                user_challenge.current_streak += 1
-            elif not checkin.is_completed and (existing_checkin and existing_checkin.is_completed):
+            elif not is_completed and was_completed:
                 user_challenge.completed_days -= 1
-                user_challenge.current_streak = 0
+        else:
+            # Создаем новую отметку
+            checkin = DailyCheckin.objects.create(
+                user_challenge=user_challenge,
+                date=today,
+                is_completed=is_completed,
+                rating=int(rating) if rating else None,
+                notes=notes
+            )
             
-            checkin.save()
-            user_challenge.save()
-            
-            messages.success(request, 'Отметка сохранена!')
-            return redirect('profile')
-    else:
-        form = DailyCheckinForm(instance=existing_checkin)
+            # Увеличиваем счетчик только если выполнено
+            if is_completed:
+                user_challenge.completed_days += 1
+        
+        # Рассчитываем текущую серию
+        streak = 0
+        checkins = user_challenge.checkins.filter(is_completed=True).order_by('-date')
+        for checkin_day in checkins:
+            streak += 1
+        user_challenge.current_streak = streak
+        
+        user_challenge.save()
+        
+        messages.success(request, 'Отметка сохранена!')
+        return redirect('profile')
     
     return render(request, 'challenges/daily_checkin.html', {
         'user_challenge': user_challenge,
-        'form': form,
-        'today': today
+        'today': today,
+        'existing_checkin': existing_checkin
+    })
+
+@login_required
+def complete_challenge(request, challenge_id):
+    """Завершить челлендж досрочно"""
+    user_challenge = get_object_or_404(UserChallenge, pk=challenge_id, user=request.user)
+    
+    if request.method == 'POST':
+        confirm = request.POST.get('confirm')
+        if confirm == 'yes':
+            user_challenge.status = 'completed'
+            user_challenge.save()
+            messages.success(request, f'Челлендж "{user_challenge.title}" завершен!')
+            return redirect('profile')
+        else:
+            messages.info(request, 'Отмена завершения челленджа.')
+            return redirect('profile')
+    
+    return render(request, 'challenges/complete_challenge.html', {
+        'user_challenge': user_challenge
+    })
+
+@login_required
+def challenge_calendar(request, challenge_id):
+    """Календарь прогресса челленджа"""
+    user_challenge = get_object_or_404(UserChallenge, pk=challenge_id, user=request.user)
+    
+    # Создаем данные для календаря
+    calendar_data = []
+    start_date = user_challenge.start_date
+    end_date = user_challenge.end_date or (start_date + timedelta(days=user_challenge.duration_days))
+    
+    current_date = start_date
+    while current_date <= end_date:
+        checkin = user_challenge.checkins.filter(date=current_date).first()
+        calendar_data.append({
+            'date': current_date,
+            'is_completed': checkin.is_completed if checkin else False,
+            'rating': checkin.rating if checkin else None,
+            'notes': checkin.notes if checkin else ''
+        })
+        current_date += timedelta(days=1)
+    
+    return render(request, 'challenges/challenge_calendar.html', {
+        'user_challenge': user_challenge,
+        'calendar_data': calendar_data
     })

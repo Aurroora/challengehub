@@ -1,0 +1,49 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Начать челлендж{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">🚀 Начать челлендж</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>{{ challenge.title }}</h5>
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="badge bg-secondary">{{ challenge.get_category_display }}</span>
+                        <span class="badge bg-warning text-dark">{{ challenge.difficulty_stars }}</span>
+                        <span class="badge bg-info">{{ challenge.duration_days }} дней</span>
+                    </div>
+                    <p class="text-muted">{{ challenge.description }}</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_notes" class="form-label">Ваши заметки на старте (необязательно)</label>
+                        <textarea name="notes" class="form-control" id="id_notes" rows="3" placeholder="Почему вы хотите начать этот челлендж? Какие цели?"></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6>📅 Челендж начнется сегодня!</h6>
+                        <p class="mb-0">Вы будете отмечать выполнение каждый день в течение {{ challenge.duration_days }} дней.</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="submit" class="btn btn-success btn-lg me-md-2">
+                            🎯 Начать челлендж
+                        </button>
+                        <a href="{% url 'challenge_detail' challenge.pk %}" class="btn btn-outline-secondary btn-lg">
+                            ← Назад
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
