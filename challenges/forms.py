@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import UserChallenge, DailyCheckin
 
-# Формы для пользователей
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
@@ -34,7 +33,6 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['username', 'email']
 
-# Формы для челленджей
 class StartChallengeForm(forms.ModelForm):
     """Форма для начала челленджа"""
     class Meta:

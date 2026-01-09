@@ -4,41 +4,220 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ChallengeHub - Трекер челленджей{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4a4a9e;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
         body {
-            padding-top: 20px;
             background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        .container {
+            max-width: 1400px !important;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+        
         .challenge-card {
-            transition: transform 0.2s;
-            margin-bottom: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            margin-bottom: 25px;
             border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
+        
         .challenge-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
         }
-        .category-badge {
-            font-size: 0.8rem;
+        
+        .btn-custom {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
         }
-        .difficulty-stars {
-            color: #ffc107;
+        
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
         }
-        .progress {
-            height: 20px;
+        
+        .btn-custom:active {
+            transform: translateY(-1px);
         }
+        
+        .btn-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn-custom:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(40, 40);
+                opacity: 0;
+            }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #1e9afe 0%, #60d0fa 100%);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+            border: none;
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #667eea;
+            color: #667eea;
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .plotly-graph-div {
+            width: 100% !important;
+            border-radius: 10px;
+        }
+        
         .navbar-brand {
-            font-weight: bold;
-            color: #4a4a9e !important;
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .table-hover tbody tr {
+            transition: all 0.2s;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+            transform: scale(1.002);
+        }
+        
+        .progress {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .btn-outline-secondary.btn-custom {
+            background-color: #f8f9fa !important;
+            border-color: #dee2e6 !important;
+        }
+
+        .btn-outline-secondary.btn-custom:hover {
+            background-color: #e9ecef !important;
+            border-color: #ced4da !important;
+        }
+
+        .btn-outline-info.btn-custom {
+            background-color: #e8f4fd !important;
+            border-color: #86cfda !important;
+        }
+
+        .btn-outline-info.btn-custom:hover {
+            background-color: #d1ecf1 !important;
+            border-color: #5bc0de !important;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .challenge-card {
+                margin-bottom: 20px;
+            }
+            
+            .btn-custom {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white rounded mb-4 shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white rounded-3 mb-4 shadow-sm" style="padding: 15px 25px;">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'home' %}">🎯 ChallengeHub</a>
                 
@@ -51,7 +230,9 @@
                         <a class="nav-link" href="{% url 'challenge_list' %}">Все челленджи</a>
                         
                         {% if user.is_authenticated %}
-                            <a class="nav-link" href="{% url 'profile' %}">👤 {{ user.username }}</a>
+                            <a class="nav-link" href="{% url 'profile' %}">
+                                <strong>👤 {{ user.username }}</strong>
+                            </a>
                             <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
                         {% else %}
                             <a class="nav-link" href="{% url 'login' %}">Войти</a>
@@ -64,7 +245,7 @@
 
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -74,12 +255,45 @@
         {% block content %}{% endblock %}
 
         <footer class="mt-5 pt-4 text-center text-muted border-top">
-            <p>ChallengeHub &copy; {% now "Y" %} - Трекер персональных челленджей</p>
+            <p class="mb-1">ChallengeHub &copy; {% now "Y" %} - Трекер персональных челленджей</p>
             <p class="small">Создавайте привычки. Отслеживайте прогресс. Достигайте целей.</p>
         </footer>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.btn:not(.btn-sm):not(.btn-lg)');
+        buttons.forEach(btn => {
+            if (!btn.classList.contains('btn-outline')) {
+                btn.classList.add('btn-custom');
+            }
+        });
+        
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            const progress = bar.getAttribute('data-progress') || bar.style.width;
+            if (progress) {
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = progress.includes('%') ? progress : progress + '%';
+                }, 300);
+            }
+        });
+        
+        // Плавное появление элементов
+        const fadeElements = document.querySelectorAll('.challenge-card, .stat-card, .card');
+        fadeElements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+    </script>
 </body>
 </html>

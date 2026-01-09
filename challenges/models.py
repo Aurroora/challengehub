@@ -95,9 +95,13 @@ class UserChallenge(models.Model):
             return self.start_date + timedelta(days=self.duration_days)
         return None
     
-    @property
+    @property 
     def days_passed(self):
-        return (timezone.now().date() - self.start_date).days + 1
+        """Сколько дней прошло с начала челленджа"""
+        if self.start_date:
+            days = (timezone.now().date() - self.start_date).days + 1
+            return max(0, min(days, self.duration_days)) if self.duration_days else days
+        return 0
     
     @property
     def days_left(self):
@@ -113,10 +117,22 @@ class UserChallenge(models.Model):
     
     @property
     def completion_percentage(self):
-        if self.duration_days:
-            return int((self.completed_days / self.duration_days) * 100)
+        if self.duration_days and self.duration_days > 0:
+            return min(100, int((self.completed_days / self.duration_days) * 100))
         return 0
 
+    @property
+    def display_progress_percentage(self):
+        """Корректный процент для отображения"""
+        try:
+            if self.duration_days and self.duration_days > 0:
+                if self.completed_days > 0:
+                    progress = (self.completed_days / self.duration_days) * 100
+                    return min(100, round(progress, 1))
+                return 0
+            return 0
+        except (ZeroDivisionError, TypeError):
+            return 0
 
 class DailyCheckin(models.Model):
     RATING_CHOICES = [

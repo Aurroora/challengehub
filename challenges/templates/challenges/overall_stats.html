@@ -1,0 +1,95 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Общая статистика{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'profile' %}">Профиль</a></li>
+            <li class="breadcrumb-item active">Общая статистика</li>
+        </ol>
+    </nav>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="card-title mb-0">Общая статистика пользователя</h4>
+        </div>
+        <div class="card-body">
+            {% if not has_data %}
+            <div class="alert alert-info">
+                <h5>Нет данных для анализа</h5>
+                <p>{{ message }}</p>
+                <a href="{% url 'challenge_list' %}" class="btn btn-primary">
+                    Начать первый челлендж
+                </a>
+            </div>
+            {% else %}
+            
+            <!-- Основная статистика -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-2">🎯</div>
+                            <h3>{{ statistics.total_challenges }}</h3>
+                            <p class="card-text">Всего челленджей</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-2">✅</div>
+                            <h3>{{ statistics.completed_challenges }}</h3>
+                            <p class="card-text">Завершено</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-2">📊</div>
+                            <h3>{{ statistics.avg_completion_rate }}%</h3>
+                            <p class="card-text">Средний процент</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-2">📅</div>
+                            <h3>{{ statistics.total_days_tracked }}</h3>
+                            <p class="card-text">Дней трекинга</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% for title, graph in graphs %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    {{ graph|safe }}
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-custom px-4 py-2 me-2">
+            ← Назад в профиль
+        </a>
+        {% if user_challenge.status == 'active' %}
+        <a href="{% url 'daily_checkin' user_challenge.id %}" class="btn btn-primary btn-custom px-4 py-2 me-2">
+            📝 Сделать отметку
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

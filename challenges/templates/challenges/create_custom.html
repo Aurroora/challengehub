@@ -1,0 +1,163 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Создать свой челлендж{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'challenge_list' %}">Челленджи</a></li>
+            <li class="breadcrumb-item active">Создать свой челлендж</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card stat-card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="card-title mb-0">Создать свой челлендж</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        Создайте персонализированный челлендж, который соответствует именно вашим целям и интересам.
+                    </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_custom_title" class="form-label fw-bold">Название челленджа *</label>
+                                    <input type="text" name="custom_title" class="form-control form-control-lg" 
+                                           id="id_custom_title" placeholder="Например: Читать 30 минут в день" required>
+                                    <div class="form-text">Придумайте вдохновляющее название</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_custom_category" class="form-label fw-bold">Категория *</label>
+                                    <select name="custom_category" class="form-select form-control-lg" id="id_custom_category" required>
+                                        <option value="">Выберите категорию</option>
+                                        <option value="sport">🏃 Спорт</option>
+                                        <option value="creative">🎨 Творчество</option>
+                                        <option value="study">📚 Обучение</option>
+                                        <option value="health">💊 Здоровье</option>
+                                        <option value="productivity">⚡ Продуктивность</option>
+                                        <option value="other">📌 Другое</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_custom_description" class="form-label fw-bold">Описание *</label>
+                            <textarea name="custom_description" class="form-control" id="id_custom_description" 
+                                      rows="4" placeholder="Опишите ваш челлендж. Что нужно делать? Какие правила?" required></textarea>
+                            <div class="form-text">Детальное описание поможет не сбиться с пути</div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_custom_duration" class="form-label fw-bold">Длительность (дней) *</label>
+                                    <input type="number" name="custom_duration" class="form-control form-control-lg" 
+                                           id="id_custom_duration" placeholder="21" min="1" max="365" required>
+                                    <div class="form-text">Рекомендуем: 21 день для формирования привычки</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_notes" class="form-label fw-bold">Заметки на старте</label>
+                                    <textarea name="notes" class="form-control" id="id_notes" 
+                                              rows="3" placeholder="Почему вы хотите начать этот челлендж?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card border-info mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">Примеры для вдохновения</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong>🏃 Спорт:</strong>
+                                            <ul class="small mb-0">
+                                                <li>30 дней утренней зарядки</li>
+                                                <li>21 день без лифта</li>
+                                                <li>10000 шагов каждый день</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong>📚 Обучение:</strong>
+                                            <ul class="small mb-0">
+                                                <li>Читать 30 минут в день</li>
+                                                <li>Учить 10 новых слов ежедневно</li>
+                                                <li>30 дней программирования</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h6>Важно!</h6>
+                            <p class="mb-0">
+                                После создания челлендж начнется сегодня. Вы сможете отмечать выполнение ежедневно в личном кабинете.
+                            </p>
+                        </div>
+                        
+                        <div class="d-grid gap-3 d-md-flex">
+                            <button type="submit" class="btn btn-success btn-custom px-5 py-3 fs-5 me-md-3">
+                                Создать челлендж
+                            </button>
+                            <a href="{% url 'challenge_list' %}" class="btn btn-outline-secondary btn-custom px-4 py-3 fs-5">
+                                ← Назад к шаблонам
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card stat-card mt-4">
+                <div class="card-body">
+                    <h6>Преимущества своих челленджей</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="small">
+                                <li class="mb-2">🎯 Полностью под ваши цели</li>
+                                <li class="mb-2">📊 Гибкая длительность</li>
+                                <li class="mb-2">💪 Личная мотивация</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="small">
+                                <li class="mb-2">📈 Лучший результат</li>
+                                <li class="mb-2">🏆 Больше удовлетворения</li>
+                                <li>🌟 Уникальный опыт</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control-lg {
+    padding: 12px 16px;
+    font-size: 1.1rem;
+}
+
+.form-label {
+    font-size: 1.1rem;
+}
+</style>
+{% endblock %}

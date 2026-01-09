@@ -12,7 +12,7 @@
             <div class="card-body">
                 {% if existing_checkin %}
                 <div class="alert alert-warning">
-                    <strong>⚠️ Вы уже отметились сегодня</strong>
+                    <strong>Вы уже отметились сегодня</strong>
                     <p class="mb-0">Можете изменить отметку ниже. Она заменит предыдущую.</p>
                 </div>
                 {% endif %}
@@ -80,7 +80,7 @@
                     </div>
                     
                     <div class="alert alert-info">
-                        <h6>📅 Сегодня: {{ today|date:"d.m.Y" }}</h6>
+                        <h6>Сегодня: {{ today|date:"d.m.Y" }}</h6>
                         <p class="mb-0">Эта отметка будет сохранена за сегодняшним днем.</p>
                     </div>
                     
@@ -98,7 +98,7 @@
         
         <div class="card mt-3">
             <div class="card-body">
-                <h6>📊 История отметок</h6>
+                <h6>История отметок</h6>
                 {% if user_challenge.checkins.all %}
                     <div class="table-responsive">
                         <table class="table table-sm">
