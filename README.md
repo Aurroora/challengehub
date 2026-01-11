@@ -41,7 +41,7 @@
 
 ## Как запустить проект локально
 1. **Клонируйте репозиторий**
-git clone [https://github.com/Aurroora/challengehub.git]
+git clone https://github.com/Aurroora/challengehub.git
 cd challengehub
 2. **Создайте виртуальное окружение**
 python -m venv venv
