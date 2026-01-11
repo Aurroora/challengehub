@@ -35,7 +35,7 @@
             <div class="row">
                 {% for day in calendar_data %}
                 <div class="col-6 col-md-4 col-lg-3 mb-3">
-                    <div class="card {% if day.is_completed %}border-success{% else %}border-light{% endif %}">
+                    <div class="card {% if day.is_completed %}border-success{% elif day.date < today and not day.is_completed %}border-danger{% else %}border-light{% endif %}">
                         <div class="card-body text-center p-2">
                             <div class="small text-muted">{{ day.date|date:"d.m" }}</div>
                             <div class="fs-4 mb-1">
@@ -43,9 +43,11 @@
                                     ✅
                                 {% else %}
                                     {% if day.date < today %}
-                                        ❌
+                                        ❌ <!-- Пропущенный день -->
+                                    {% elif day.date == today %}
+                                        📝 <!-- Сегодня -->
                                     {% else %}
-                                        📅
+                                        📅 <!-- Будущий день -->
                                     {% endif %}
                                 {% endif %}
                             </div>

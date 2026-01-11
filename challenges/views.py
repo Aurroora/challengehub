@@ -104,32 +104,24 @@ def start_challenge(request, pk):
     """Начать челлендж"""
     challenge = get_object_or_404(ChallengeTemplate, pk=pk, is_active=True)
     
-    existing_challenge = UserChallenge.objects.filter(
-        user=request.user,
-        template=challenge,
-        status='active'
-    ).first()
-    
-    if existing_challenge:
-        messages.info(request, 'Вы уже участвуете в этом челлендже!')
-        return redirect('challenge_detail', pk=pk)
-    
     if request.method == 'POST':
-        notes = request.POST.get('notes', '')
-        
-        user_challenge = UserChallenge.objects.create(
-            user=request.user,
-            template=challenge,
-            status='active',
-            notes=notes,
-            start_date=now().date()
-        )
-        
-        messages.success(request, f'Челлендж "{challenge.title}" начат! Удачи!')
-        return redirect('profile')
+        form = StartChallengeForm(request.POST)
+        if form.is_valid():
+            user_challenge = UserChallenge.objects.create(
+                user=request.user,
+                template=challenge,
+                status='active',
+                notes=form.cleaned_data['notes'],
+                start_date=now().date()
+            )
+            messages.success(request, f'Челлендж "{challenge.title}" начат! Удачи!')
+            return redirect('profile')
+    else:
+        form = StartChallengeForm()
     
     return render(request, 'challenges/start_challenge.html', {
-        'challenge': challenge
+        'challenge': challenge,
+        'form': form
     })
 
 @login_required
@@ -251,6 +243,8 @@ def challenge_calendar(request, challenge_id):
     end_date = user_challenge.end_date or (start_date + timedelta(days=user_challenge.duration_days))
     
     current_date = start_date
+    today = now().date()
+    
     while current_date <= end_date:
         checkin = user_challenge.checkins.filter(date=current_date).first()
         calendar_data.append({
@@ -263,7 +257,8 @@ def challenge_calendar(request, challenge_id):
     
     return render(request, 'challenges/challenge_calendar.html', {
         'user_challenge': user_challenge,
-        'calendar_data': calendar_data
+        'calendar_data': calendar_data,
+        'today': today
     })
 
 def get_motivational_quote():

@@ -132,17 +132,15 @@
                                         <td>
                                             {% with progress=challenge.display_progress_percentage|default:0 %}
                                             <div class="d-flex flex-column align-items-start">
-                                                <div class="progress mb-1" style="height: 10px; width: 120px;">
-                                                    <div class="progress-bar bg-success custom-progress-bar" 
-                                                        data-progress="{{ progress }}">
-                                                    </div>
-                                                </div>
-                                                <small class="text-muted">
+                                                <div class="fw-bold" style="font-size: 1.1rem;">
                                                     {% if challenge.days_passed > 0 %}
                                                         {{ progress|floatformat:0 }}%
                                                     {% else %}
-                                                        Еще не начат
+                                                        <span class="text-muted">Еще не начат</span>
                                                     {% endif %}
+                                                </div>
+                                                <small class="text-muted">
+                                                    {{ challenge.completed_days }}/{{ challenge.duration_days }} дней
                                                 </small>
                                             </div>
                                             {% endwith %}

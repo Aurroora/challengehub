@@ -25,7 +25,8 @@
                     
                     <div class="mb-3">
                         <label for="id_notes" class="form-label">Ваши заметки на старте (необязательно)</label>
-                        <textarea name="notes" class="form-control" id="id_notes" rows="3" placeholder="Почему вы хотите начать этот челлендж? Какие цели?"></textarea>
+                        <textarea name="notes" class="form-control" id="id_notes" rows="3" 
+                                placeholder="Почему вы хотите начать этот челлендж? Какие цели?">{{ form.notes.value|default:"" }}</textarea>
                     </div>
                     
                     <div class="alert alert-info">
