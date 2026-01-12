@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: challengehub
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+      
+      # Создаем суперпользователя для админки
+      echo "from django.contrib.auth.models import User; \
+        User.objects.create_superuser('admin', 'admin@example.com', 'admin123') \
+        if not User.objects.filter(username='admin').exists() else None" | python manage.py shell
+      
+      # Загружаем стандартные челленджи
+      python manage.py seed_challenges
+      
+    startCommand: gunicorn challengehub.wsgi:application
+    
+    # Настройки сервера
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: challengehub.settings
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+
+    # Автоматическое развертывание из ветки main
+    autoDeploy: true
+    branch: main
+    
+    # Ресурсы
+    plan: free
+    disk:
+      name: data
+      mountPath: /opt/render/project/data
+      sizeGB: 1

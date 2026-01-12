@@ -11,11 +11,11 @@
 - **Личный кабинет** - вся статистика в одном месте
 
 ## Технологии
-- **Backend**: Python 3.13, Django 6.0
+- **Backend**: Python 3.13, Django 4.2.11
 - **Frontend**: Bootstrap 5.3, HTML5, CSS3, JavaScript
-- **Data Science**: Plotly 5.17.0, Pandas 2.0.3
+- **Data Science**: Plotly 6.5.0, Pandas 2.3.3
 - **База данных**: SQLite (разработка), PostgreSQL (продакшн)
-- **Деплой**: PythonAnywhere
+- **Деплой**: Render
 
 ## Data Science
 Проект использует библиотеки анализа данных:
@@ -54,7 +54,3 @@ python manage.py migrate
 5. **Запустите сервер**
 python manage.py runserver
 6. **Откройте проект в браузере: http://127.0.0.1:8000/**
-
-## Данные для демо-входа
-Логин: Аня
-Пароль: admin12345
