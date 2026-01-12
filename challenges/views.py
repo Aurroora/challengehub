@@ -19,43 +19,44 @@ def logout_view(request):
 
 def home(request):
     """Главная страница"""
-    featured_challenges = ChallengeTemplate.objects.filter(is_active=True).order_by('?')[:3]
-    return render(request, 'challenges/home.html', {'featured_challenges': featured_challenges})
-
+    return render(request, 'challenges/home.html')    
+    
 def challenge_list(request):
-    """Список всех шаблонов челленджей"""
-    challenges = ChallengeTemplate.objects.filter(is_active=True)
-    
-    category = request.GET.get('category')
-    if category:
-        challenges = challenges.filter(category=category)
-    
-    sort = request.GET.get('sort', 'title')
-    if sort == 'difficulty':
-        challenges = challenges.order_by('difficulty')
-    elif sort == 'duration':
-        challenges = challenges.order_by('duration_days')
+    """Список созданных пользователем челленджей с фильтрацией"""
+    if request.user.is_authenticated:
+        challenges = UserChallenge.objects.filter(user=request.user)
+        
+        # Фильтрация по категории
+        category = request.GET.get('category')
+        if category:
+            challenges = challenges.filter(custom_category=category)
+        
+        # Сортировка
+        sort = request.GET.get('sort', 'date')
+        if sort == 'title':
+            challenges = challenges.order_by('custom_title')
+        elif sort == 'difficulty':
+            # Для кастомных челленджей сложность не хранится, можно добавить поле
+            challenges = challenges.order_by('custom_title')
+        elif sort == 'duration':
+            challenges = challenges.order_by('custom_duration')
+        elif sort == 'date':
+            challenges = challenges.order_by('-start_date')
+        
+        # Добавляем поле difficulty для шаблона (если нет в модели)
+        for challenge in challenges:
+            challenge.difficulty = 2  # Средняя сложность по умолчанию
     else:
-        challenges = challenges.order_by('title')
+        challenges = None
     
-    return render(request, 'challenges/challenge_list.html', {'challenges': challenges})
+    return render(request, 'challenges/challenge_list.html', {
+        'challenges': challenges,
+        'user': request.user
+    })
 
 def challenge_detail(request, pk):
-    """Детальная страница челленджа"""
-    challenge = get_object_or_404(ChallengeTemplate, pk=pk, is_active=True)
-    
-    user_challenge = None
-    if request.user.is_authenticated:
-        user_challenge = UserChallenge.objects.filter(
-            user=request.user, 
-            template=challenge,
-            status='active'
-        ).first()
-    
-    return render(request, 'challenges/challenge_detail.html', {
-        'challenge': challenge,
-        'user_challenge': user_challenge
-    })
+    """Готовых шаблонов больше нет - редирект"""
+    return redirect('create_custom')
 
 def register(request):
     """Регистрация пользователя"""
@@ -101,28 +102,8 @@ def profile(request):
 
 @login_required
 def start_challenge(request, pk):
-    """Начать челлендж"""
-    challenge = get_object_or_404(ChallengeTemplate, pk=pk, is_active=True)
-    
-    if request.method == 'POST':
-        form = StartChallengeForm(request.POST)
-        if form.is_valid():
-            user_challenge = UserChallenge.objects.create(
-                user=request.user,
-                template=challenge,
-                status='active',
-                notes=form.cleaned_data['notes'],
-                start_date=now().date()
-            )
-            messages.success(request, f'Челлендж "{challenge.title}" начат! Удачи!')
-            return redirect('profile')
-    else:
-        form = StartChallengeForm()
-    
-    return render(request, 'challenges/start_challenge.html', {
-        'challenge': challenge,
-        'form': form
-    })
+    """Готовых шаблонов больше нет - редирект"""
+    return redirect('create_custom')
 
 @login_required
 def create_custom_challenge(request):

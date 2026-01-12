@@ -69,7 +69,8 @@ class CustomChallengeForm(forms.ModelForm):
     """Форма для создания своего челленджа"""
     class Meta:
         model = UserChallenge
-        fields = ['custom_title', 'custom_description', 'custom_category', 'custom_duration', 'notes']
+        fields = ['custom_title', 'custom_description', 'custom_category', 
+                 'custom_duration', 'custom_difficulty', 'notes']
         widgets = {
             'custom_title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -87,9 +88,17 @@ class CustomChallengeForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Количество дней'
             }),
+            'custom_difficulty': forms.Select(attrs={
+                'class': 'form-select'
+            }),
             'notes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
                 'placeholder': 'Дополнительные заметки...'
             }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Настройка выпадающего списка для сложности
+        self.fields['custom_difficulty'].choices = UserChallenge.CUSTOM_DIFFICULTY_CHOICES

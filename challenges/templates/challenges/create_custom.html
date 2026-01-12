@@ -69,11 +69,21 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="id_notes" class="form-label fw-bold">Заметки на старте</label>
-                                    <textarea name="notes" class="form-control" id="id_notes" 
-                                              rows="3" placeholder="Почему вы хотите начать этот челлендж?"></textarea>
+                                    <label for="id_custom_difficulty" class="form-label fw-bold">Сложность *</label>
+                                    <select name="custom_difficulty" class="form-select form-control-lg" id="id_custom_difficulty" required>
+                                        <option value="">Выберите сложность</option>
+                                        <option value="1">⭐ Легко</option>
+                                        <option value="2" selected>⭐⭐ Средне</option>
+                                        <option value="3">⭐⭐⭐ Сложно</option>
+                                    </select>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_notes" class="form-label fw-bold">Заметки на старте</label>
+                            <textarea name="notes" class="form-control" id="id_notes" 
+                                      rows="3" placeholder="Почему вы хотите начать этот челлендж?"></textarea>
                         </div>
                         
                         <div class="card border-info mb-4">
@@ -118,7 +128,7 @@
                                 Создать челлендж
                             </button>
                             <a href="{% url 'challenge_list' %}" class="btn btn-outline-secondary btn-custom px-4 py-3 fs-5">
-                                ← Назад к шаблонам
+                                ← Назад к челленджам
                             </a>
                         </div>
                     </form>

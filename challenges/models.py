@@ -49,6 +49,18 @@ class UserChallenge(models.Model):
         ('paused', 'Приостановлен'),
     ]
     
+    CUSTOM_DIFFICULTY_CHOICES = [
+        (1, '⭐ Легко'),
+        (2, '⭐⭐ Средне'),
+        (3, '⭐⭐⭐ Сложно'),
+    ]
+    
+    custom_difficulty = models.IntegerField(
+        choices=CUSTOM_DIFFICULTY_CHOICES, 
+        default=2, 
+        verbose_name="Сложность (кастомная)"
+    )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     template = models.ForeignKey(ChallengeTemplate, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Шаблон")
     custom_title = models.CharField(max_length=200, blank=True, verbose_name="Название (кастомное)")

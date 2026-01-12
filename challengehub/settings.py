@@ -84,9 +84,11 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'challenges/static']
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'challenges/static'),
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -95,15 +97,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if 'RENDER' in os.environ:
     DEBUG = False
-    
-    ALLOWED_HOSTS = [
-        os.environ.get('RENDER_EXTERNAL_HOSTNAME'),
-        'localhost',
-        '127.0.0.1'
-    ]
+    ALLOWED_HOSTS = ['*']
     
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-ALLOWED_HOSTS = ['*']
+    
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+    ]
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 DEBUG = False
