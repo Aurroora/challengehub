@@ -1,0 +1,131 @@
+{% extends 'challenges/base.html' %}
+
+{% block title %}ChallengeHub - Мои достижения{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'profile' %}">Профиль</a></li>
+            <li class="breadcrumb-item active">Достижения</li>
+        </ol>
+    </nav>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="card-title mb-0">Мои достижения</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-3">🏆</div>
+                            <h3>{{ total_achievements }}</h3>
+                            <p class="card-text">Всего достижений</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-3">✅</div>
+                            <h3>{{ completed_achievements }}</h3>
+                            <p class="card-text">Выполнено</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="fs-1 mb-3">📊</div>
+                            <h3>{{ completion_rate|floatformat:0 }}%</h3>
+                            <p class="card-text">Процент выполнения</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% for type, type_achievements in achievements_by_type.items %}
+            <h5 class="mt-4 mb-3">
+                {% if type == 'streak' %}Серии дней
+                {% elif type == 'completion' %}Завершения
+                {% elif type == 'consistency' %}Регулярность
+                {% elif type == 'variety' %}Разнообразие
+                {% endif %}
+            </h5>
+            
+            <div class="row">
+                {% for achievement in type_achievements %}
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100 {% if achievement.is_completed %}border-success{% else %}border-light{% endif %}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="fs-2 me-3">{{ achievement.icon }}</div>
+                                <div>
+                                    <h6 class="card-title mb-1">{{ achievement.title }}</h6>
+                                    <p class="small text-muted mb-0">{{ achievement.description }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if not achievement.is_completed %}
+                            <div class="progress mb-2" style="height: 8px;">
+                                <div class="progress-bar" 
+                                     data-progress="{{ achievement.progress_percentage }}"
+                                     style="width: 0%;">
+                                </div>
+                            </div>
+                            <div class="small text-muted text-center">
+                                {{ achievement.progress }} / {{ achievement.target }}
+                            </div>
+                            {% else %}
+                            <div class="text-center text-success">
+                                <small>✅ Выполнено {{ achievement.earned_date|date:"d.m.Y" }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+            {% if not achievements %}
+            <div class="text-center py-5">
+                <div class="fs-1 mb-3">🏆</div>
+                <h5>Достижений пока нет</h5>
+                <p class="text-muted mb-4">Начинайте челленджи и отмечайте выполнение, чтобы получить достижения!</p>
+                <a href="{% url 'challenge_list' %}" class="btn btn-primary btn-custom">
+                    Начать челлендж
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Анимация прогресс-баров для достижений
+    const progressBars = document.querySelectorAll('.progress-bar[data-progress]');
+    progressBars.forEach(bar => {
+        const progress = bar.getAttribute('data-progress');
+        setTimeout(() => {
+            bar.style.width = progress + '%';
+        }, 300);
+    });
+    
+    // Плавное появление карточек
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

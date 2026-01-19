@@ -15,6 +15,9 @@
                     <a href="{% url 'overall_stats' %}" class="btn btn-info btn-custom px-4 py-3">
                         Общая статистика
                     </a>
+                    <a href="{% url 'achievements' %}" class="btn btn-warning btn-custom px-4 py-3">
+                        Достижения
+                    </a>
                     <a href="{% url 'challenge_list' %}" class="btn btn-primary btn-custom px-4 py-3">
                         + Новый челлендж
                     </a>
@@ -46,8 +49,8 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="p-3 rounded-3" style="background-color: #f3e5f5;">
-                                <div class="fs-1 fw-bold text-secondary">{{ completed_challenges }}</div>
-                                <div class="text-muted">Завершённых</div>
+                                <div class="fs-1 fw-bold text-success">{{ completed_challenges }}</div>
+                                <div class="text-muted">Успешно завершённых</div>
                             </div>
                         </div>
                     </div>

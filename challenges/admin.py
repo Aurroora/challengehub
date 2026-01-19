@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ChallengeTemplate, UserChallenge, DailyCheckin
+from .models import ChallengeTemplate, UserChallenge, DailyCheckin, Achievement
 
 @admin.register(ChallengeTemplate)
 class ChallengeTemplateAdmin(admin.ModelAdmin):
@@ -43,3 +43,11 @@ class DailyCheckinAdmin(admin.ModelAdmin):
             return dict(self.model.RATING_CHOICES)[obj.rating]
         return "Не оценено"
     rating_display.short_description = 'Оценка'
+
+
+@admin.register(Achievement)
+class AchievementAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title', 'type', 'is_completed', 'progress', 'target', 'earned_date')
+    list_filter = ('type', 'earned_date')
+    search_fields = ('user__username', 'title', 'description')
+    readonly_fields = ('earned_date', 'is_completed', 'progress_percentage')

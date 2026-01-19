@@ -4,14 +4,15 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.utils.timezone import now
 import pandas as pd
-
-from .models import ChallengeTemplate, UserChallenge, DailyCheckin
-from .forms import UserRegisterForm, UserUpdateForm, StartChallengeForm, CustomChallengeForm
-
-from datetime import datetime, timedelta
 import plotly.graph_objects as go
 import plotly.offline as opy
 import random
+from datetime import datetime, timedelta
+from django.db import models
+
+from .models import ChallengeTemplate, UserChallenge, DailyCheckin, Achievement
+from .forms import UserRegisterForm, UserUpdateForm, StartChallengeForm, CustomChallengeForm
+from .achievements import check_and_create_achievements
 
 def logout_view(request):
     logout(request)
@@ -91,13 +92,13 @@ def profile(request):
     )
     
     active_challenges = user_challenges.filter(status='active').count()
-    completed_challenges = user_challenges.filter(status='completed').count()
+    successful_completed = user_challenges.filter(status='completed').count()
     
     return render(request, 'challenges/profile.html', {
         'user_form': user_form,
         'user_challenges': user_challenges,
         'active_challenges': active_challenges,
-        'completed_challenges': completed_challenges,
+        'completed_challenges': successful_completed,
     })
 
 @login_required
@@ -149,16 +150,17 @@ def daily_checkin(request, challenge_id):
         rating = request.POST.get('rating')
         notes = request.POST.get('notes', '')
         
+        was_completed_before = existing_checkin.is_completed if existing_checkin else False
+        
         if existing_checkin:
-            was_completed = existing_checkin.is_completed
             existing_checkin.is_completed = is_completed
             existing_checkin.rating = int(rating) if rating else None
             existing_checkin.notes = notes
             existing_checkin.save()
             
-            if is_completed and not was_completed:
+            if is_completed and not was_completed_before:
                 user_challenge.completed_days += 1
-            elif not is_completed and was_completed:
+            elif not is_completed and was_completed_before:
                 user_challenge.completed_days -= 1
         else:
             checkin = DailyCheckin.objects.create(
@@ -172,13 +174,56 @@ def daily_checkin(request, challenge_id):
             if is_completed:
                 user_challenge.completed_days += 1
         
+        # Пересчитываем текущую серию
         streak = 0
         checkins = user_challenge.checkins.filter(is_completed=True).order_by('-date')
         for checkin_day in checkins:
             streak += 1
         user_challenge.current_streak = streak
         
+        # Сохраняем изменения в челлендже
         user_challenge.save()
+        
+        # Проверяем, не завершился ли челлендж
+        user_challenge.check_and_complete()
+        
+        # ✅ ВАЖНОЕ ИЗМЕНЕНИЕ: Пересчитываем ВСЕ достижения
+        try:
+            # Импортируем новую функцию
+            from .achievements import recalculate_all_achievements
+            
+            # Пересоздаем все достижения
+            new_achievements = recalculate_all_achievements(request.user)
+            
+            # Показываем только действительно НОВЫЕ достижения
+            # (те, которые только что созданы после пересчета)
+            if new_achievements:
+                for achievement in new_achievements:
+                    messages.success(
+                        request, 
+                        f'🎉 Новое достижение: "{achievement.title}"! '
+                        f'{achievement.description}'
+                    )
+            else:
+                # Если достижения были, но все старые
+                existing_achievements_count = Achievement.objects.filter(user=request.user).count()
+                if existing_achievements_count > 0:
+                    messages.info(request, f'У вас {existing_achievements_count} достижений. Продолжайте в том же духе!')
+                    
+        except Exception as e:
+            print(f"Ошибка при создании достижений: {e}")
+            # Если что-то пошло не так, пробуем старый метод как fallback
+            try:
+                from .achievements import check_and_create_achievements
+                new_achievements = check_and_create_achievements(request.user)
+                if new_achievements:
+                    for achievement in new_achievements:
+                        messages.success(
+                            request, 
+                            f'🎉 Новое достижение: "{achievement.title}"!'
+                        )
+            except Exception as e2:
+                print(f"Fallback тоже не сработал: {e2}")
         
         messages.success(request, 'Отметка сохранена!')
         return redirect('profile')
@@ -203,6 +248,14 @@ def complete_challenge(request, challenge_id):
         if confirm == 'yes':
             user_challenge.status = 'completed'
             user_challenge.save()
+            
+            try:
+                new_achievements = check_and_create_achievements(request.user)
+                if new_achievements:
+                    for achievement in new_achievements:
+                        messages.info(request, f'🏆 Достижение: {achievement.title}!')
+            except Exception as e:
+                print(f"Ошибка при создании достижений: {e}")
             
             messages.success(request, f'Челлендж "{user_challenge.title}" завершен! Прогресс: {user_challenge.completion_percentage}%')
             return redirect('profile')
@@ -537,4 +590,26 @@ def overall_statistics(request):
         'graphs': graphs,
         'statistics': statistics,
         'has_data': True
+    })
+
+@login_required
+def achievements(request):
+    """Страница достижений пользователя"""
+    user_achievements = Achievement.objects.filter(user=request.user).order_by('-earned_date')
+    
+    achievements_by_type = {}
+    for achievement in user_achievements:
+        if achievement.type not in achievements_by_type:
+            achievements_by_type[achievement.type] = []
+        achievements_by_type[achievement.type].append(achievement)
+    
+    total_achievements = user_achievements.count()
+    completed_achievements = user_achievements.filter(progress__gte=models.F('target')).count()
+    
+    return render(request, 'challenges/achievements.html', {
+        'achievements': user_achievements,
+        'achievements_by_type': achievements_by_type,
+        'total_achievements': total_achievements,
+        'completed_achievements': completed_achievements,
+        'completion_rate': (completed_achievements / total_achievements * 100) if total_achievements > 0 else 0
     })

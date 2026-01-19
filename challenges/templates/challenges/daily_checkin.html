@@ -39,6 +39,13 @@
                         progressBar.style.width = width + '%';
                     });
                     </script>
+
+                    {% if user_challenge.days_passed == user_challenge.duration_days and user_challenge.status == 'active' %}
+                    <div class="alert alert-success">
+                        <h6>🎉 Это последний день челленджа!</h6>
+                        <p class="mb-0">После отметки сегодня челлендж будет автоматически завершен.</p>
+                    </div>
+                    {% endif %}
                     
                     <div class="d-flex justify-content-between small text-muted">
                         <span>Начало: {{ user_challenge.start_date|date:"d.m.Y" }}</span>

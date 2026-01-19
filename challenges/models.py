@@ -146,6 +146,29 @@ class UserChallenge(models.Model):
         except (ZeroDivisionError, TypeError):
             return 0
 
+    @property
+    def end_date(self):
+        if self.duration_days:
+            return self.start_date + timedelta(days=self.duration_days - 1)
+        return None
+        
+    def check_and_complete(self):
+        """Проверяет, завершен ли челлендж, и обновляет статус"""
+        if self.status == 'active' and self.duration_days:
+            # Если прошло столько дней, сколько длится челлендж
+            if self.days_passed >= self.duration_days:
+                # Если выполнены все дни
+                if self.completed_days >= self.duration_days:
+                    self.status = 'completed'
+                    self.save()
+                    return True, 'completed'
+                else:
+                    # Если не все дни выполнены
+                    self.status = 'failed'
+                    self.save()
+                    return True, 'failed'
+        return False, None
+
 class DailyCheckin(models.Model):
     RATING_CHOICES = [
         (1, '😞 Плохо'),
@@ -171,3 +194,43 @@ class DailyCheckin(models.Model):
     def __str__(self):
         status = "✅" if self.is_completed else "❌"
         return f"{self.user_challenge} - {self.date} {status}"
+
+
+class Achievement(models.Model):
+    """Достижения пользователей"""
+    
+    ACHIEVEMENT_TYPES = [
+        ('streak', 'Серия дней'),
+        ('completion', 'Завершение челленджей'),
+        ('consistency', 'Регулярность'),
+        ('variety', 'Разнообразие'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+    type = models.CharField(max_length=20, choices=ACHIEVEMENT_TYPES, verbose_name="Тип достижения")
+    title = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(verbose_name="Описание")
+    icon = models.CharField(max_length=10, default="🏆", verbose_name="Иконка")
+    earned_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата получения")
+    progress = models.IntegerField(default=0, verbose_name="Прогресс")
+    target = models.IntegerField(default=1, verbose_name="Цель")
+    
+    class Meta:
+        verbose_name = "Достижение"
+        verbose_name_plural = "Достижения"
+        ordering = ['-earned_date']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
+    
+    @property
+    def is_completed(self):
+        """Достижение выполнено?"""
+        return self.progress >= self.target
+    
+    @property
+    def progress_percentage(self):
+        """Процент выполнения"""
+        if self.target > 0:
+            return min(100, int((self.progress / self.target) * 100))
+        return 100
